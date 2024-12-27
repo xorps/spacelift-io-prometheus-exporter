@@ -61,6 +61,14 @@ var (
 		Destination: &apiKeySecret,
 	}
 
+	isFileKeySecret     bool
+	flagIsFileKeySecret = &cli.BoolFlag{
+		Name:        "api-key-secret-file",
+		Usage:       "Api key secret will be read from filesystem",
+		EnvVars:     []string{"SPACELIFT_PROMEX_API_KEY_SECRET_IS_FILE"},
+		Destination: &isFileKeySecret,
+	}
+
 	isDevelopment     bool
 	flagIsDevelopment = &cli.BoolFlag{
 		Name:        "is-development",
@@ -89,6 +97,7 @@ var serveCommand *cli.Command = &cli.Command{
 		flagAPIEndpoint,
 		flagAPIKeyID,
 		flagAPIKeySecret,
+		flagIsFileKeySecret,
 		flagIsDevelopment,
 		flagScrapeTimeout,
 	},
@@ -106,10 +115,17 @@ var serveCommand *cli.Command = &cli.Command{
 
 		logger.Info("Prepping exporter for lift-off")
 
+		var keySecret session.Secret
+		if isFileKeySecret {
+			keySecret = session.NewFileSecret(apiKeySecret)
+		} else {
+			keySecret = session.NewInlineSecret(apiKeySecret)
+		}
+
 		session, err := func() (session.Session, error) {
 			sessionCtx, cancel := context.WithTimeout(ctx, time.Second*5)
 			defer cancel()
-			return session.New(sessionCtx, http.DefaultClient, apiEndpoint, apiKeyID, apiKeySecret)
+			return session.New(sessionCtx, http.DefaultClient, apiEndpoint, apiKeyID, keySecret)
 		}()
 		if err != nil {
 			logger.Fatalw("failed to create Spacelift API session", zap.Error(err))

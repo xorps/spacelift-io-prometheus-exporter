@@ -37,4 +37,4 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64
           push: false
-          tags: "public.ecr.aws/spacelift/promex:pr-build"
+          tags: "gcr.io/xorps/spacelift-promex:pr-build"
