@@ -1,4 +1,4 @@
-name: Security
+name: 🔐 Security
 
 on:
   push: { branches: [main] }
@@ -14,6 +14,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with: { go-version-file: go.mod }
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
@@ -34,6 +38,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # Note that gosec is already part of golangci-lint, but here we're more interested
+      # in uploading the results of the scan.
       - name: Run GoSec Security Scanner
         uses: securego/gosec@master
         with:

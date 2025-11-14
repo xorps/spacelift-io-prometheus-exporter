@@ -9,24 +9,19 @@ run:
   # include test files or not, default is true
   tests: false
 
-  # default is true. Enables skipping of directories:
-  #   vendor$, third_party$, testdata$, examples$, Godeps$, builtin$
-  skip-dirs-use-default: true
-
 # output configuration options
 output:
   # colored-line-number|line-number|json|tab|checkstyle|code-climate|junit-xml|github-actions
   # default is "colored-line-number"
-  format: colored-line-number
+  formats:
+    - format: colored-line-number
+      path: stdout
 
   # print lines of code with issue, default is true
   print-issued-lines: true
 
   # print linter name in the end of issue text, default is true
   print-linter-name: true
-
-  # make issues output unique by line, default is true
-  uniq-by-line: true
 
   # add a prefix to the output file references; default is no prefix
   path-prefix: ""
@@ -49,7 +44,6 @@ linters-settings:
     min-len: 2
     min-occurrences: 2
   staticcheck:
-    go: "1.18"
     checks: ["all", "-SA1019"]
   gocritic:
     enabled-tags:
@@ -73,9 +67,11 @@ linters-settings:
   goimports:
     local-prefixes: github.com/spacelift-io/prometheus-exporter
   govet:
-    check-shadowing: false
+    enable-all: true
+    disable:
+      - shadow
+      - fieldalignment
   nolintlint:
-    allow-leading-space: true # don't require machine-readable nolint directives (i.e. with no leading space)
     require-explanation: false # don't require an explanation for nolint directives
     require-specific: false # don't require nolint directives to be specific about which linter is being skipped
   depguard:
@@ -89,8 +85,8 @@ linters-settings:
 linters:
   disable-all: true
   enable:
+    - copyloopvar
     - depguard
-    - exportloopref
     - gci
     - gocritic
     - gofmt
